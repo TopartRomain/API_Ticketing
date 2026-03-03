@@ -1,10 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-/**
- * Middleware d'authentification JWT.
- * Ajoute req.user avec { id, role, team } si le token est valide.
- */
 const auth = async (req, res, next) => {
   try {
     const header = req.headers.authorization;
@@ -18,7 +14,6 @@ const auth = async (req, res, next) => {
     const token = header.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Vérifier que l'utilisateur existe toujours
     const user = await User.findById(decoded.id).select('name email role team');
     if (!user) {
       const err = new Error('Utilisateur introuvable');

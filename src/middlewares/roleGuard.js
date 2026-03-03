@@ -1,7 +1,3 @@
-/**
- * Middleware de contrôle d'accès par rôle.
- * Usage : roleGuard('support', 'manager')
- */
 const roleGuard = (...allowedRoles) => (req, res, next) => {
   if (!req.user) {
     const err = new Error('Authentification requise');

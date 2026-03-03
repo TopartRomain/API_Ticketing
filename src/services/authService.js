@@ -2,9 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const authService = {
-  /**
-   * Inscription d'un nouvel utilisateur
-   */
   async register({ name, email, password, role, team }) {
     const existing = await User.findOne({ email });
     if (existing) {
@@ -22,9 +19,6 @@ const authService = {
     };
   },
 
-  /**
-   * Connexion d'un utilisateur
-   */
   async login({ email, password }) {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
@@ -47,9 +41,6 @@ const authService = {
     };
   },
 
-  /**
-   * Génère un JWT
-   */
   generateToken(user) {
     return jwt.sign(
       { id: user._id, role: user.role, team: user.team },
