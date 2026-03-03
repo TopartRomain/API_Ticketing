@@ -3,11 +3,7 @@ const User = require('../models/User');
 const { canTransition } = require('../utils/statusTransitions');
 
 const ticketService = {
-  // ────────────────────────────────────────────────────────
-  // Création
-  // ────────────────────────────────────────────────────────
   async create(data, user) {
-    // Règle : un collaborateur ne peut pas créer un ticket 'critical'
     if (user.role === 'collaborateur' && data.priority === 'critical') {
       const err = new Error('Un collaborateur ne peut pas créer un ticket avec la priorité "critical"');
       err.statusCode = 403;
@@ -18,22 +14,16 @@ const ticketService = {
     return ticket.populate('author', 'name email role team');
   },
 
-  // ────────────────────────────────────────────────────────
-  // Liste selon rôle + filtres
-  // ────────────────────────────────────────────────────────
   async list(user, query) {
     const filter = {};
 
-    // Visibilité par rôle
     if (user.role === 'collaborateur') {
       filter.author = user.id;
     } else if (user.role === 'manager') {
       const teamMembers = await User.find({ team: user.team }).select('_id');
       filter.author = { $in: teamMembers.map((m) => m._id) };
     }
-    // support → pas de filtre, voit tout
 
-    // Filtres optionnels
     if (query.status) filter.status = query.status;
     if (query.priority) filter.priority = query.priority;
     if (query.category) filter.category = query.category;
@@ -46,9 +36,6 @@ const ticketService = {
     return tickets;
   },
 
-  // ────────────────────────────────────────────────────────
-  // Détail d'un ticket
-  // ────────────────────────────────────────────────────────
   async getById(ticketId, user) {
     const ticket = await Ticket.findById(ticketId)
       .populate('author', 'name email role team')
@@ -64,9 +51,6 @@ const ticketService = {
     return ticket;
   },
 
-  // ────────────────────────────────────────────────────────
-  // Changement de statut
-  // ────────────────────────────────────────────────────────
   async updateStatus(ticketId, newStatus, user) {
     const ticket = await Ticket.findById(ticketId);
     if (!ticket) {
@@ -91,9 +75,6 @@ const ticketService = {
     ]);
   },
 
-  // ────────────────────────────────────────────────────────
-  // Modification de la priorité
-  // ────────────────────────────────────────────────────────
   async updatePriority(ticketId, newPriority, user) {
     if (user.role !== 'manager') {
       const err = new Error('Seul un manager peut modifier la priorité');
@@ -119,9 +100,6 @@ const ticketService = {
     ]);
   },
 
-  // ────────────────────────────────────────────────────────
-  // Assignation d'un ticket
-  // ────────────────────────────────────────────────────────
   async assign(ticketId, assignedToId, user) {
     if (user.role !== 'support') {
       const err = new Error('Seul le support peut assigner un ticket');
@@ -145,7 +123,6 @@ const ticketService = {
 
     ticket.assignedTo = assignedToId;
 
-    // Passer automatiquement en 'assigned' si le ticket est 'open'
     if (ticket.status === 'open') {
       ticket.status = 'assigned';
     }
@@ -158,9 +135,6 @@ const ticketService = {
     ]);
   },
 
-  // ────────────────────────────────────────────────────────
-  // Vérification de visibilité
-  // ────────────────────────────────────────────────────────
   _checkVisibility(ticket, user) {
     if (user.role === 'support') return;
 

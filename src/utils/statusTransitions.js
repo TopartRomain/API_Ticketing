@@ -1,9 +1,3 @@
-/**
- * Transitions de statut autorisées.
- * Clé = statut actuel, valeur = tableau d'objets { to, roles, authorOnly }
- *
- * authorOnly : seul l'auteur du ticket peut effectuer cette transition
- */
 const ALLOWED_TRANSITIONS = {
   open: [
     { to: 'assigned', roles: ['support'] },
@@ -20,10 +14,6 @@ const ALLOWED_TRANSITIONS = {
   ],
 };
 
-/**
- * Vérifie si une transition de statut est autorisée.
- * @returns {{ allowed: boolean, reason?: string }}
- */
 const canTransition = (currentStatus, newStatus, userRole, userId, ticketAuthorId) => {
   const transitions = ALLOWED_TRANSITIONS[currentStatus];
 
