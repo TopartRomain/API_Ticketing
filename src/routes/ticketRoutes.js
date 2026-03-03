@@ -21,9 +21,9 @@ router.get('/', getTickets);
 router.get('/:id', getTicketById);
 
 // Actions sur un ticket
-router.patch('/:id/status', roleGuard('support', 'collaborateur'), updateStatus);
-router.patch('/:id/priority', roleGuard('manager'), updatePriority);
-router.patch('/:id/assign', roleGuard('support'), assignTicket);
+router.put('/:id/status', roleGuard('support', 'collaborateur'), updateStatus);
+router.put('/:id/priority', roleGuard('manager'), updatePriority);
+router.put('/:id/assign', roleGuard('support'), assignTicket);
 
 // Commentaires
 router.post('/:id/comments', addComment);
