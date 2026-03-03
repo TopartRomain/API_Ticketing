@@ -1,73 +1,69 @@
 const ticketService = require('../services/ticketService');
 
-// @desc    Get all tickets
-// @route   GET /api/tickets
-const getAllTickets = (req, res, next) => {
-  try {
-    const tickets = ticketService.findAll();
-    res.status(200).json({ success: true, data: tickets });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// @desc    Get single ticket by ID
-// @route   GET /api/tickets/:id
-const getTicketById = (req, res, next) => {
-  try {
-    const ticket = ticketService.findById(req.params.id);
-    if (!ticket) {
-      return res.status(404).json({ success: false, message: 'Ticket non trouvé' });
-    }
-    res.status(200).json({ success: true, data: ticket });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// @desc    Create a ticket
+// @desc    Créer un ticket
 // @route   POST /api/tickets
-const createTicket = (req, res, next) => {
+const createTicket = async (req, res, next) => {
   try {
-    const ticket = ticketService.create(req.body);
+    const ticket = await ticketService.create(req.body, req.user);
     res.status(201).json({ success: true, data: ticket });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Update a ticket
-// @route   PUT /api/tickets/:id
-const updateTicket = (req, res, next) => {
+// @desc    Lister les tickets (selon rôle + filtres)
+// @route   GET /api/tickets
+const getTickets = async (req, res, next) => {
   try {
-    const ticket = ticketService.update(req.params.id, req.body);
-    if (!ticket) {
-      return res.status(404).json({ success: false, message: 'Ticket non trouvé' });
-    }
+    const tickets = await ticketService.list(req.user, req.query);
+    res.status(200).json({ success: true, count: tickets.length, data: tickets });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Consulter un ticket
+// @route   GET /api/tickets/:id
+const getTicketById = async (req, res, next) => {
+  try {
+    const ticket = await ticketService.getById(req.params.id, req.user);
     res.status(200).json({ success: true, data: ticket });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc    Delete a ticket
-// @route   DELETE /api/tickets/:id
-const deleteTicket = (req, res, next) => {
+// @desc    Modifier le statut d'un ticket
+// @route   PATCH /api/tickets/:id/status
+const updateStatus = async (req, res, next) => {
   try {
-    const deleted = ticketService.remove(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: 'Ticket non trouvé' });
-    }
-    res.status(200).json({ success: true, message: 'Ticket supprimé' });
+    const ticket = await ticketService.updateStatus(req.params.id, req.body.status, req.user);
+    res.status(200).json({ success: true, data: ticket });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = {
-  getAllTickets,
-  getTicketById,
-  createTicket,
-  updateTicket,
-  deleteTicket,
+// @desc    Modifier la priorité d'un ticket
+// @route   PATCH /api/tickets/:id/priority
+const updatePriority = async (req, res, next) => {
+  try {
+    const ticket = await ticketService.updatePriority(req.params.id, req.body.priority, req.user);
+    res.status(200).json({ success: true, data: ticket });
+  } catch (err) {
+    next(err);
+  }
 };
+
+// @desc    Assigner un ticket
+// @route   PATCH /api/tickets/:id/assign
+const assignTicket = async (req, res, next) => {
+  try {
+    const ticket = await ticketService.assign(req.params.id, req.body.assignedTo, req.user);
+    res.status(200).json({ success: true, data: ticket });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { createTicket, getTickets, getTicketById, updateStatus, updatePriority, assignTicket };
