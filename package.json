@@ -1,0 +1,20 @@
+{
+  "name": "api_ticketing",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/TopartRomain/API_Ticketing#readme",
+  "bugs": {
+    "url": "https://github.com/TopartRomain/API_Ticketing/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TopartRomain/API_Ticketing.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
